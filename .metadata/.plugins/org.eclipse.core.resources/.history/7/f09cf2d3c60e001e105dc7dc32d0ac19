@@ -1,0 +1,53 @@
+package entidades;
+
+public class Cliente {
+    private int codCli;
+    private String nomCli;
+    private String apCli;
+    private String celCli;
+    private String nomDis;
+
+ 
+    public int getCodCli() {
+        return codCli;
+    }
+
+    public void setCodCli(int codCli) {
+        this.codCli = codCli;
+    }
+
+    public String getNomCli() {
+        return nomCli;
+    }
+
+    public void setNomCli(String nomCli) {
+        this.nomCli = nomCli;
+    }
+
+    public String getApCli() {
+        return apCli;
+    }
+
+    public void setApCli(String apCli) {
+        this.apCli = apCli;
+    }
+
+    public String getCelCli() {
+        return celCli;
+    }
+
+    public void setCelCli(String celCli) {
+        this.celCli = celCli;
+    }
+
+ 
+    public String getNomDis() {
+		return nomDis;
+	}
+
+	public void setNomDis(String nomDis) {
+		this.nomDis = nomDis;
+	}
+
+}
+

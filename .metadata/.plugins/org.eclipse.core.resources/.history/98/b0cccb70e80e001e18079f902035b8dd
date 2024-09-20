@@ -1,0 +1,225 @@
+package Gui;
+
+import entidades.Producto;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+import Dao.ProductoDAO;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+public class ProductoGUI extends JFrame {
+    private ProductoDAO productoDAO;
+    private JButton btnRegistrar;
+    private JButton btnEditar;
+    private JButton btnEliminar;
+    private JButton btnLimpiar;
+    private JTable tablaProductos;
+    private DefaultTableModel modeloTabla;
+    private JLabel lblCodigo;
+    private JTextField txtNombre;
+    private JLabel lblNombre;
+    private JTextField txtPrecio;
+    private JLabel lblPrecio;
+    private JTextField txtCodigo;
+
+    public ProductoGUI() {
+        productoDAO = new ProductoDAO(); // Reemplaza "ProductoDAO" con el nombre de tu clase DAO para la entidad Producto
+
+        setTitle("Gestión de Productos");
+ 
+        setSize(559, 507);
+        setLocationRelativeTo(null);
+        getContentPane().setLayout(new BorderLayout());
+        JPanel panelBotones = crearPanelBotones();
+        JScrollPane panelTabla = crearPanelTabla();
+        getContentPane().add(panelBotones, BorderLayout.CENTER);
+        getContentPane().add(panelTabla, BorderLayout.SOUTH);
+
+        cargarDatosTabla();
+
+        setVisible(true);
+    }
+
+
+
+    private JPanel crearPanelBotones() {
+        JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        btnRegistrar = new JButton("Registrar");
+        btnRegistrar.setBounds(35, 190, 117, 23);
+        btnEditar = new JButton("Editar");
+        btnEditar.setBounds(166, 190, 114, 23);
+        btnEliminar = new JButton("Eliminar");
+        btnEliminar.setBounds(287, 190, 96, 23);
+        btnLimpiar = new JButton("Limpiar");
+        btnLimpiar.setBounds(389, 190, 106, 23);
+
+        btnRegistrar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                registrarProducto();
+            }
+        });
+
+        btnEditar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                editarProducto();
+            }
+        });
+
+        btnEliminar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                eliminarProducto();
+            }
+        });
+
+        btnLimpiar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                limpiarCampos();
+            }
+        });
+        panel.setLayout(null);
+
+        panel.add(btnRegistrar);
+        panel.add(btnEditar);
+        panel.add(btnEliminar);
+        panel.add(btnLimpiar);
+        
+        lblCodigo = new JLabel("Código:");
+        lblCodigo.setBounds(49, 29, 89, 20);
+        panel.add(lblCodigo);
+        
+        txtNombre = new JTextField();
+        txtNombre.setBounds(233, 87, 96, 20);
+        panel.add(txtNombre);
+        
+        lblNombre = new JLabel("Nombre:");
+        lblNombre.setBounds(48, 90, 96, 20);
+        panel.add(lblNombre);
+        
+        txtPrecio = new JTextField();
+        txtPrecio.setBounds(233, 61, 96, 20);
+        panel.add(txtPrecio);
+        
+        lblPrecio = new JLabel("Precio:");
+        lblPrecio.setBounds(45, 60, 85, 20);
+        panel.add(lblPrecio);
+        
+        txtCodigo = new JTextField();
+        txtCodigo.setBounds(229, 32, 96, 20);
+        panel.add(txtCodigo);
+
+        return panel;
+    }
+
+    private JScrollPane crearPanelTabla() {
+        modeloTabla = new DefaultTableModel();
+        modeloTabla.addColumn("Código");
+        modeloTabla.addColumn("Nombre");
+        modeloTabla.addColumn("Precio");
+
+        tablaProductos = new JTable(modeloTabla);
+        tablaProductos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        JScrollPane scrollPane = new JScrollPane(tablaProductos);
+        scrollPane.setPreferredSize(new Dimension(700, 200));
+
+        return scrollPane;
+    }
+
+    private void cargarDatosTabla() {
+        List<Producto> productos = productoDAO.obtenerProductos();
+
+        modeloTabla.setRowCount(0); // Limpiar filas existentes
+
+        for (Producto producto : productos) {
+            Object[] fila = {producto.getCodPro(), producto.getNomPro(), producto.getPrecioPro()};
+            modeloTabla.addRow(fila);
+        }
+    }
+
+    private void registrarProducto() {
+    	try {
+            String codigo = txtCodigo.getText();
+            String nombre = txtNombre.getText();
+            String precio = txtPrecio.getText();
+
+            Producto producto = new Producto();
+            producto.setCodPro(Integer.parseInt(codigo));
+            producto.setNomPro(nombre);
+            producto.setPrecioPro(Double.parseDouble(precio));
+
+            productoDAO.insertarProducto(producto);
+            JOptionPane.showMessageDialog(null, "Producto registrado correctamente.");
+            limpiarCampos();
+            cargarDatosTabla();
+            
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, "No se puede Registrar Verique los campos", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+
+    }
+
+    private void editarProducto() {
+        int filaSeleccionada = tablaProductos.getSelectedRow();
+
+        if (filaSeleccionada != -1) {
+            String codigo = txtCodigo.getText();
+            String nombre = txtNombre.getText();
+            String precio = txtPrecio.getText();
+
+            int codigoProducto = (int) tablaProductos.getValueAt(filaSeleccionada, 0);
+
+            Producto producto = new Producto();
+            producto.setCodPro(codigoProducto);
+            producto.setNomPro(nombre);
+            producto.setPrecioPro(Double.parseDouble(precio));
+
+            productoDAO.actualizarProducto(producto);
+            JOptionPane.showMessageDialog(null, "Producto editado correctamente.");
+            limpiarCampos();
+            cargarDatosTabla();
+        } else {
+            JOptionPane.showMessageDialog(this, "Seleccione un producto de la tabla para editar.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void eliminarProducto() {
+        int filaSeleccionada = tablaProductos.getSelectedRow();
+
+        if (filaSeleccionada != -1) {
+            int codigo = (int) tablaProductos.getValueAt(filaSeleccionada, 0);
+
+            productoDAO.eliminarProducto(codigo);
+            JOptionPane.showMessageDialog(null, "Producto eliminado correctamente.");
+            limpiarCampos();
+            cargarDatosTabla();
+        } else {
+            JOptionPane.showMessageDialog(this, "Seleccione un producto de la tabla para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void limpiarCampos() {
+        txtCodigo.setText("");
+        txtNombre.setText("");
+        txtPrecio.setText("");
+        tablaProductos.clearSelection();
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new ProductoGUI();
+            }
+        });
+    }
+}
+

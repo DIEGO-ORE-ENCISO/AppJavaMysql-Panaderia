@@ -1,0 +1,81 @@
+package Gui;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class LoginGUI extends JFrame {
+
+    private JTextField txtUsername;
+    private JPasswordField txtPassword;
+    private JButton btnLogin;
+
+    public LoginGUI() {
+        super("Login");
+        initializeComponents();
+        setupLayout();
+        setupListeners();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(300, 200);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private void initializeComponents() {
+        txtUsername = new JTextField(20);
+        txtPassword = new JPasswordField(20);
+        btnLogin = new JButton("Login");
+    }
+
+    private void setupLayout() {
+        JPanel panel = new JPanel();
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                .addGroup(layout.createSequentialGroup()
+                        .addComponent(new JLabel("Username"))
+                        .addComponent(txtUsername))
+                .addGroup(layout.createSequentialGroup()
+                        .addComponent(new JLabel("Password"))
+                        .addComponent(txtPassword))
+                .addComponent(btnLogin)
+        );
+
+        layout.setVerticalGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(new JLabel("Username"))
+                        .addComponent(txtUsername))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(new JLabel("Password"))
+                        .addComponent(txtPassword))
+                .addComponent(btnLogin)
+        );
+
+        getContentPane().add(panel, BorderLayout.CENTER);
+    }
+
+    private void setupListeners() {
+        btnLogin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = txtUsername.getText();
+                char[] password = txtPassword.getPassword();
+                // Aquí puedes realizar la lógica de autenticación
+                // utilizando los valores de username y password
+            }
+        });
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new LoginGUI();
+            }
+        });
+    }
+}

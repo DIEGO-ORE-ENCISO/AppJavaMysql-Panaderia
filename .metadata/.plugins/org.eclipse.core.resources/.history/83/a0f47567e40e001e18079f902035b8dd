@@ -1,0 +1,227 @@
+package Gui;
+
+import entidades.Empleado;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+import Dao.EmpleadoDAO;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+public class EmpleadoGUI extends JFrame {
+    private EmpleadoDAO empleadoDAO;
+
+    private JTextField txtCodigo;
+    private JTextField txtNombre;
+    private JTextField txtApellido;
+    private JButton btnRegistrar;
+    private JButton btnEditar;
+    private JButton btnEliminar;
+    private JButton btnLimpiar;
+    private JTable tablaEmpleados;
+    private DefaultTableModel modeloTabla;
+    private JLabel lblNewLabel;
+
+    public EmpleadoGUI() {
+        empleadoDAO = new EmpleadoDAO(); // Reemplaza "EmpleadoDAO" con el nombre de tu clase DAO para la entidad Empleado
+
+        setTitle("Gestión de Empleados");
+        setSize(446, 400);
+        setLocationRelativeTo(null);
+        getContentPane().setLayout(new BorderLayout());
+
+        JPanel panelFormulario = crearPanelFormulario();
+        JPanel panelBotones = crearPanelBotones();
+        JScrollPane panelTabla = crearPanelTabla();
+
+        getContentPane().add(panelFormulario, BorderLayout.NORTH);
+        getContentPane().add(panelBotones, BorderLayout.CENTER);
+        getContentPane().add(panelTabla, BorderLayout.SOUTH);
+
+        cargarDatosTabla();
+
+        setVisible(true);
+    }
+
+    private JPanel crearPanelFormulario() {
+        JPanel panel = new JPanel(new GridLayout(3, 2));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel lblCodigo = new JLabel("Código:");
+        JLabel lblNombre = new JLabel("Nombre:");
+        JLabel lblApellido = new JLabel("Apellido:");
+
+        txtCodigo = new JTextField();
+        txtNombre = new JTextField();
+        txtApellido = new JTextField();
+
+        panel.add(lblCodigo);
+        panel.add(txtCodigo);
+        panel.add(lblNombre);
+        panel.add(txtNombre);
+        panel.add(lblApellido);
+        panel.add(txtApellido);
+
+        return panel;
+    }
+
+    private JPanel crearPanelBotones() {
+        JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        btnRegistrar = new JButton("Registrar");
+        btnRegistrar.setBounds(46, 15, 77, 23);
+        btnEditar = new JButton("Editar");
+        btnEditar.setBounds(128, 15, 75, 23);
+        btnEliminar = new JButton("Eliminar");
+        btnEliminar.setBounds(213, 15, 88, 23);
+        btnLimpiar = new JButton("Limpiar");
+        btnLimpiar.setBounds(311, 15, 65, 23);
+
+        btnRegistrar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                registrarEmpleado();
+            }
+        });
+
+        btnEditar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                editarEmpleado();
+            }
+        });
+
+        btnEliminar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                eliminarEmpleado();
+            }
+        });
+
+        btnLimpiar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                limpiarCampos();
+            }
+        });
+        panel.setLayout(null);
+
+        panel.add(btnRegistrar);
+        panel.add(btnEditar);
+        panel.add(btnEliminar);
+        panel.add(btnLimpiar);
+        
+        lblNewLabel = new JLabel("");
+        lblNewLabel.setIcon(new ImageIcon("C:\\Users\\User\\Desktop\\ProyecotEFSRT\\IMG\\pan (1).jpg"));
+        lblNewLabel.setBounds(0, -77, 430, 158);
+        panel.add(lblNewLabel);
+
+        return panel;
+    }
+
+    private JScrollPane crearPanelTabla() {
+        modeloTabla = new DefaultTableModel();
+        modeloTabla.addColumn("Código");
+        modeloTabla.addColumn("Nombre");
+        modeloTabla.addColumn("Apellido");
+
+        tablaEmpleados = new JTable(modeloTabla);
+        tablaEmpleados.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        JScrollPane scrollPane = new JScrollPane(tablaEmpleados);
+        scrollPane.setPreferredSize(new Dimension(700, 200));
+
+        return scrollPane;
+    }
+
+    private void cargarDatosTabla() {
+        List<Empleado> empleados = empleadoDAO.obtenerEmpleados();
+
+        modeloTabla.setRowCount(0); // Limpiar filas existentes
+
+        for (Empleado empleado : empleados) {
+            Object[] fila = {empleado.getCodEmp(), empleado.getNomEmp(), empleado.getApEmp()};
+            modeloTabla.addRow(fila);
+        }
+    }
+
+    private void registrarEmpleado() {
+    	
+    	try {
+    		  String codigo = txtCodigo.getText();
+    	        String nombre = txtNombre.getText();
+    	        String apellido = txtApellido.getText();
+
+    	        Empleado empleado = new Empleado();
+    	        empleado.setCodEmp(Integer.parseInt(codigo));
+    	        empleado.setNomEmp(nombre);
+    	        empleado.setApEmp(apellido);
+
+    	        empleadoDAO.insertarEmpleado(empleado);
+    	        JOptionPane.showMessageDialog(null, "Empleado registrado correctamente.");
+    	        limpiarCampos();
+    	        cargarDatosTabla();
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, "No se puede Registrar Verique los campos", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+      
+    }
+
+    private void editarEmpleado() {
+        int filaSeleccionada = tablaEmpleados.getSelectedRow();
+
+        if (filaSeleccionada != -1) {
+            String codigo = txtCodigo.getText();
+            String nombre = txtNombre.getText();
+            String apellido = txtApellido.getText();
+
+            int codigoEmpleado = (int) tablaEmpleados.getValueAt(filaSeleccionada, 0);
+
+            Empleado empleado = new Empleado();
+            empleado.setCodEmp(codigoEmpleado);
+            empleado.setNomEmp(nombre);
+            empleado.setApEmp(apellido);
+
+            empleadoDAO.actualizarEmpleado(empleado);
+            JOptionPane.showMessageDialog(null, "Empleado editado correctamente.");
+            limpiarCampos();
+            cargarDatosTabla();
+        } else {
+            JOptionPane.showMessageDialog(this, "Seleccione un empleado de la tabla para editar.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void eliminarEmpleado() {
+        int filaSeleccionada = tablaEmpleados.getSelectedRow();
+
+        if (filaSeleccionada != -1) {
+            int codigo = (int) tablaEmpleados.getValueAt(filaSeleccionada, 0);
+
+            empleadoDAO.eliminarEmpleado(codigo);
+            JOptionPane.showMessageDialog(null, "Empleado eliminado correctamente.");
+            limpiarCampos();
+            cargarDatosTabla();
+        } else {
+            JOptionPane.showMessageDialog(this, "Seleccione un empleado de la tabla para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void limpiarCampos() {
+        txtCodigo.setText("");
+        txtNombre.setText("");
+        txtApellido.setText("");
+        tablaEmpleados.clearSelection();
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new EmpleadoGUI();
+            }
+        });
+    }
+}

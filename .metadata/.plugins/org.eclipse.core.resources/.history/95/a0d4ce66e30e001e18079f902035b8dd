@@ -1,0 +1,115 @@
+package Gui;
+
+import entidades.Empleado;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+import Dao.EmpleadoDAO;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+public class EmpleadoGUI extends JFrame {
+    private EmpleadoDAO empleadoDAO;
+
+    private JTextField txtCodigo;
+    private JTextField txtNombre;
+    private JTextField txtApellido;
+    private JTable tablaEmpleados;
+    private DefaultTableModel modeloTabla;
+    private JButton btnRegistrar;
+    private JButton btnEditar;
+    private JButton btnEliminar;
+    private JButton btnLimpiar;
+
+    public EmpleadoGUI() {
+        empleadoDAO = new EmpleadoDAO(); // Reemplaza "EmpleadoDAO" con el nombre de tu clase DAO para la entidad Empleado
+
+        setTitle("Gestión de Empleados");
+        setSize(800, 400);
+        setLocationRelativeTo(null);
+        getContentPane().setLayout(new BorderLayout());
+
+        JPanel panelFormulario = crearPanelFormulario();
+        JScrollPane panelTabla = crearPanelTabla();
+
+        getContentPane().add(panelFormulario, BorderLayout.NORTH);
+        getContentPane().add(panelTabla, BorderLayout.SOUTH);
+
+        cargarDatosTabla();
+
+        setVisible(true);
+    }
+
+    private JPanel crearPanelFormulario() {
+        JPanel panel = new JPanel(new GridLayout(3, 2));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel lblCodigo = new JLabel("Código:");
+        JLabel lblNombre = new JLabel("Nombre:");
+        JLabel lblApellido = new JLabel("Apellido:");
+
+        txtCodigo = new JTextField();
+        txtNombre = new JTextField();
+        txtApellido = new JTextField();
+
+        panel.add(lblCodigo);
+        panel.add(txtCodigo);
+        panel.add(lblNombre);
+        panel.add(txtNombre);
+        panel.add(lblApellido);
+        panel.add(txtApellido);
+        
+        btnRegistrar = new JButton("Registrar");
+        panel.add(btnRegistrar);
+        
+        btnEditar = new JButton("Editar");
+        panel.add(btnEditar);
+        
+        btnEliminar = new JButton("Eliminar");
+        panel.add(btnEliminar);
+        
+        btnLimpiar = new JButton("Limpiar");
+        panel.add(btnLimpiar);
+
+        return panel;
+    }
+
+
+
+    private JScrollPane crearPanelTabla() {
+        modeloTabla = new DefaultTableModel();
+        modeloTabla.addColumn("Código");
+        modeloTabla.addColumn("Nombre");
+        modeloTabla.addColumn("Apellido");
+
+        tablaEmpleados = new JTable(modeloTabla);
+        tablaEmpleados.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        JScrollPane scrollPane = new JScrollPane(tablaEmpleados);
+        scrollPane.setPreferredSize(new Dimension(700, 200));
+
+        return scrollPane;
+    }
+
+    private void cargarDatosTabla() {
+        List<Empleado> empleados = empleadoDAO.obtenerEmpleados();
+
+        modeloTabla.setRowCount(0); // Limpiar filas existentes
+
+        for (Empleado empleado : empleados) {
+            Object[] fila = {empleado.getCodEmp(), empleado.getNomEmp(), empleado.getApEmp()};
+            modeloTabla.addRow(fila);
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new EmpleadoGUI();
+            }
+        });
+    }
+}

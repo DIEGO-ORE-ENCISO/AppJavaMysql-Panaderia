@@ -1,0 +1,66 @@
+package Gui;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class LoginGUI extends JFrame {
+
+    private JTextField txtUsername;
+    private JPasswordField txtPassword;
+    private JButton btnLogin;
+
+    public LoginGUI() {
+        super("Login");
+        initializeComponents();
+        setupLayout();
+        setupListeners();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(300, 200);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private void initializeComponents() {
+        txtUsername = new JTextField(20);
+        txtPassword = new JPasswordField(20);
+        btnLogin = new JButton("Login");
+    }
+
+    private void setupLayout() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel formPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+        formPanel.add(new JLabel("Username:"));
+        formPanel.add(txtUsername);
+        formPanel.add(new JLabel("Password:"));
+        formPanel.add(txtPassword);
+
+        panel.add(formPanel, BorderLayout.CENTER);
+        panel.add(btnLogin, BorderLayout.SOUTH);
+
+        getContentPane().add(panel);
+    }
+
+    private void setupListeners() {
+        btnLogin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = txtUsername.getText();
+                char[] password = txtPassword.getPassword();
+                // Aquí puedes realizar la lógica de autenticación
+                // utilizando los valores de username y password
+            }
+        });
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new LoginGUI();
+            }
+        });
+    }
+}
